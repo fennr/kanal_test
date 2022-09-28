@@ -1,5 +1,6 @@
 import requests
 from xmltodict import parse
+from datetime import datetime
 
 from django.db import models
 from django.core.cache import cache
@@ -29,12 +30,16 @@ class Order(models.Model):
     Заказ на поставку
     """
     vbeln = models.IntegerField(verbose_name="Order number", unique=True)
-    dtime = models.DateField(verbose_name="Delivery datetime")
+    ddate = models.DateField(verbose_name="Delivery date", default=None)
     price_usd = models.DecimalField(verbose_name="Price $", max_digits=15, decimal_places=4)
     price_rub = models.DecimalField(verbose_name="Price ₽", max_digits=15, decimal_places=4)
+    overdue_message = models.BooleanField(verbose_name="Sending message", default=False)
 
     def __str__(self):
-        return f"Order(id={self.id}, vbeln={self.vbeln}, dtime={self.dtime}, $={self.price_usd}, ₽={self.price_rub})"
+        return f"Order(id={self.id}, vbeln={self.vbeln}, dtime={self.ddate}, $={self.price_usd}, ₽={self.price_rub})"
+
+    def is_overdue(self) -> bool:
+        return True if self.ddate < datetime.now() else False
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
