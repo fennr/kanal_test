@@ -69,10 +69,12 @@ class GTable:
 
             save_ids.append(order.id)
 
+            # просто выводим в лог новые заказы
             if created:
                 logger.info(f"Add {order}")
             else:
                 pass
+            # делаем отправку в ТГ, если заказ просрочен и мы по нему ранее не писали
             if order.is_overdue and not order.overdue_message:
                 order.send_telegram(text=f"Заказ {order.vbeln} был просрочен!")
 

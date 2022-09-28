@@ -27,7 +27,7 @@ def usd_to_rub() -> float:
             return currency['Value'].replace(',', '.')
 
 
-def get_cached_price(key: str, timeout: int = 60) -> float:
+def get_cached_price(key: str, timeout: int = 600) -> float:
     value = cache.get(key)
     if not value:
         value = usd_to_rub()
@@ -70,10 +70,10 @@ class Order(models.Model):
                 self.overdue_message = True
                 super(Order, self).save()
                 time.sleep(4)  # не лучший вариант, но не допускаем слишком частых вызововов
+            return r.status_code
         except Exception:
             print("Ошибка при попытке отправить сообщение в тг."
                   "Проверьте что указан токен и он администратор группы")
-
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
