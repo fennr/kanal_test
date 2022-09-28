@@ -21,6 +21,10 @@ def setup_periodic_tasks(sender, **kwargs):
         update_db.s(os.getenv('TABLE_NAME'), os.getenv('SHEET_NAME')),
         name=f'update db every {timer} sec'
     )
+    sender.add_periodic_task(
+        5.0,
+
+    )
 
 
 @app.task

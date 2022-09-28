@@ -1,5 +1,6 @@
 import os
 import logging
+import requests
 import gspread
 import pandas as pd
 from datetime import datetime
@@ -72,9 +73,8 @@ class GTable:
                 logger.info(f"Add {order}")
             else:
                 pass
-
-            if order.is_overdue:
-                logger.info(f"Order is overdue ({order.ddate})")
+            if order.is_overdue and not order.overdue_message:
+                order.send_telegram(text=f"Заказ {order.vbeln} был просрочен!")
 
         # удаляем записи, которые не встретились в таблице
         Order.objects.exclude(id__in=save_ids).delete()

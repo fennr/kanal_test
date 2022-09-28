@@ -1,9 +1,19 @@
+import os
+
 import requests
+import time
 from xmltodict import parse
 from datetime import datetime
+import logging
 
 from django.db import models
 from django.core.cache import cache
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 
@@ -40,6 +50,30 @@ class Order(models.Model):
 
     def is_overdue(self) -> bool:
         return True if self.ddate < datetime.now() else False
+
+    def send_telegram(self, text: str):
+        try:
+            token = os.getenv('TELEGRAM_TOKEN')
+            url = "https://api.telegram.org/bot"
+            channel_id = f"@{os.getenv('TELEGRAM_CHANNEL_ID')}"
+            url += token
+            method = url + "/sendMessage"
+
+            r = requests.post(method, data={
+                "chat_id": channel_id,
+                "text": text
+            })
+
+            if r.status_code != 200:
+                logger.error("Ошибка отправки сообщения в тг")
+            else:
+                self.overdue_message = True
+                super(Order, self).save()
+                time.sleep(4)  # не лучший вариант, но не допускаем слишком частых вызововов
+        except Exception:
+            print("Ошибка при попытке отправить сообщение в тг."
+                  "Проверьте что указан токен и он администратор группы")
+
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
