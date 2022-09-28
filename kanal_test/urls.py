@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from google_service import views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', views.home, name='index'),
+    path('dashboard/', views.dashboard, name='dashboard')
 ]

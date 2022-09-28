@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Таблица Заказов{% endblock %}</title>
+</head>
+<body>
+
+  <nav class="logo">
+    <a class="logo-kanalservis" href="#">
+      <img src="https://xn--80aaglqhjo4aie.xn--p1ai/wp-content/themes/kanalservis/images/svg/logo.svg" alt="" width="300" height="100">
+    </a>
+  </nav>
+  <a href="{% url 'index' %}"></a>
+
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>
