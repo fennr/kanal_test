@@ -8,26 +8,19 @@ from google_service.models import *
 def home(request):
     orders = Order.objects.all().order_by('id')
     dates = Order.objects.order_by('ddate').values('ddate').annotate(Sum('price_usd'))
-    sum = Order.objects.aggregate(Sum('price_usd')).get('price_usd__sum')
+    sum_usd = Order.objects.aggregate(Sum('price_usd')).get('price_usd__sum')
     context = {
         'orders': orders,
         'dates': dates,
-        'sum': sum,
+        'sum': sum_usd,
     }
     return render(request, 'index.html', context=context)
 
 
-def sum(request):
-    queryset = Order.objects.all()
-    sum = 0
-    for order in queryset:
-        sum += order.price_rub
-
-    return JsonResponse(data={
-        'sum': sum
-    })
-
-def dashboard(request):
+def dashboard(request) -> JsonResponse:
+    """
+    Данные для линейной диаграммы
+    """
     queryset = Order.objects.all()
 
     labels = []
