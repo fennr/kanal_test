@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+  web:
+      build: .
+      command: bash -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8001"
+      volumes:
+        - .:/project
+      ports:
+        - "8001:8001"
+      env_file:
+        - .env
+      depends_on:
+        - db
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: unless-stopped
+  celery:
+    build: .
+    restart: always
+    command: celery -A kanal_test worker -l info --pool=solo
+    volumes:
+      - .:/project
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - web
+      - db
+  beat:
+    build: .
+    restart: always
+    command: celery -A kanal_test beat
+    volumes:
+      - .:/project
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - web
+      - db
