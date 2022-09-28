@@ -6,6 +6,9 @@ from google_service.models import *
 
 
 def home(request):
+    """
+    Главная страница
+    """
     orders = Order.objects.all().order_by('id')
     dates = Order.objects.order_by('ddate').values('ddate').annotate(Sum('price_usd'))
     sum_usd = Order.objects.aggregate(Sum('price_usd')).get('price_usd__sum')
@@ -19,7 +22,7 @@ def home(request):
 
 def dashboard(request) -> JsonResponse:
     """
-    Данные для линейной диаграммы
+    Данные для диаграммы
     """
     queryset = Order.objects.all()
 
